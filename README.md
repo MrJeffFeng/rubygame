@@ -1,2 +1,2 @@
 # Ruby Gosu Zombie Shooter
-# Coming soon!
+Coming soon!
