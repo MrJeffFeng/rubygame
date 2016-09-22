@@ -5,11 +5,10 @@ class Character
     @real_y = y
     @stand_right = Image.load_tiles($window, "media/Character/character1.png", 96, 120, false)
     @stand_left = Image.load_tiles($window, "media/Character/character1_left.png", 96, 120, false)
-    @walk_right = Image.load_tiles($window, "media/Character/character2.png", 86, 126, false)
-    @walk_left = Image.load_tiles($window, "media/Character/character2_left.png", 86, 126, false)
-  #  @walk_right3
-   # @walk_right4
-   # @walk_right5
+    @walk_right = Image.load_tiles($window, "media/Character/character3.png", 106, 116, false)
+    @walk_left = Image.load_tiles($window, "media/Character/character3_left.png", 106, 116, false)
+    @shoot_right = Image.load_tiles($window, "media/Character/character_shooting3.png", 105, 117, false)
+    @shoot_left = Image.load_tiles($window, "media/Character/character_shooting3_left.png", 105, 117, false)
     @sprite = @stand_right
     @dir = :right
     @x = @real_x + (@sprite[0].width / 2)
@@ -39,24 +38,29 @@ class Character
       elsif @dir == :right then
         @sprite = @stand_right
       end
+    end 
+    if button_down? KbSpace and @dir == :right
+      @sprite = @shooting_right
     end
-  end
-  
+    if button_down? KbSpace and @dir == :left
+      @sprite = @shooting_left
+    end
+end
   def hide()  @is_visible = false     end
   def show()  @is_visible = true      end
     
 def move_left
     @dir = :left
     @move_x = -5
-    @sprite = @walk_left
     @moving = true
-  end
+    @sprite = @walk_left
+end
 
   def move_right
     @dir = :right
     @move_x = 5
-    @sprite = @walk_right
     @moving = true
+    @sprite = @walk_right
   end
 
   def get_x
