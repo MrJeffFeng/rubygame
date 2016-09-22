@@ -1,6 +1,8 @@
 require 'Gosu'
 require 'Sprite'
 require 'Background'
+require 'Character'
+require 'SceneMap'
 
 include Gosu
 
@@ -20,6 +22,8 @@ class Game < Gosu::Window
     $scene = 'menu'
     $game_start = false
     $score = 0
+    $window = self
+    @char = SceneMap.new
     # Game Caption
     self.caption = "Zombie Shooter - Alpha - 0.0.1"
   end
@@ -28,13 +32,15 @@ class Game < Gosu::Window
     if $game_start == true
       movement
     end
+    @char.update
   end
   
   def draw
     @menu.see(0,0,0,1,1.25)
+    @title.draw
+    @char.draw
     @cursor.draw(self.mouse_x, self.mouse_y, 0)
   end
 end
 
 Game.new.show
-
