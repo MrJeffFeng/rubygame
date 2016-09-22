@@ -3,8 +3,13 @@ class Character
   def initialize(x, y)
     @real_x = x
     @real_y = y
-    @stand_right = Image.load_tiles(window, "media/Character/stand_right.png", w, h, false)
-    @stand_left = 
+    @stand_right = Image.load_tiles($window, "media/Character/character1.png", 96, 120, false)
+    @stand_left = Image.load_tiles($window, "media/Character/character1_left.png", 96, 120, false)
+    @walk_right = Image.load_tiles($window, "media/Character/character2.png", 86, 126, false)
+    @walk_left = Image.load_tiles($window, "media/Character/character2_left.png", 86, 126, false)
+  #  @walk_right3
+   # @walk_right4
+   # @walk_right5
     @sprite = @stand_right
     @dir = :right
     @x = @real_x + (@sprite[0].width / 2)
