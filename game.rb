@@ -69,12 +69,15 @@ class Game < Gosu::Window
       end
     end
    end
+   # Close Window
+   close if button_down? KbEsc
    #END
   end
 
   def draw
     @menu.see(0,0,0,1,1.25)
     @title.draw
+    @bullet.draw
     @char.draw
     @cursor.draw(self.mouse_x, self.mouse_y, 0)
   end
