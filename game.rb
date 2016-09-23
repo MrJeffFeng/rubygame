@@ -70,7 +70,7 @@ class Game < Gosu::Window
     end
    end
    # Close Window
-   close if button_down? KbEsc
+   close if button_down? KbEscape
    #END
   end
 
