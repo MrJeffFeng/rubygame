@@ -15,13 +15,14 @@ class Character
     @y = @real_y + @sprite[0].height
     @move_x = 0
     @moving = false
+    @shooting = false
     @is_visible = true
   end
 
   def update
     @real_x = @x - (@sprite[0].width / 2)
     @real_y = @y - @sprite[0].height
-
+    # Movement
     if @moving then
       if @move_x > 0 then
         @move_x -= 1
@@ -39,22 +40,23 @@ class Character
         @sprite = @stand_right
       end
     end
+    # Shooting Detection
     if button_down? KbSpace and @dir == :right
       @sprite = @shooting_right
-    end
-    if button_down? KbSpace and @dir == :left
+    elsif button_down? KbSpace and @dir == :left
       @sprite = @shooting_left
     end
+
   end
 
   def hide()  @is_visible = false     end
   def show()  @is_visible = true      end
 
   def move_left
-      @dir = :left
-      @move_x = -5
-      @moving = true
-      @sprite = @walk_left
+    @dir = :left
+    @move_x = -5
+    @moving = true
+    @sprite = @walk_left
   end
 
   def move_right
@@ -62,6 +64,10 @@ class Character
     @move_x = 5
     @moving = true
     @sprite = @walk_right
+  end
+
+  def shooting
+    @shooting = true
   end
 
   def get_x
