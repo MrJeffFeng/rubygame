@@ -11,7 +11,6 @@ class Game < Gosu::Window
     # Backgrounds / Cursor
     @cursor = Gosu::Image.new(self, 'media/cursor.png')
     @menu = Background.new(self, 'media\\menu.png')
-    # Text
     @title = Sprite.new(self, 'media\\title.png')
     # Character
     @stand_left = Sprite.new(self,'media\\Character/stand_left.png')
@@ -22,6 +21,8 @@ class Game < Gosu::Window
     @shoot_right = Sprite.new(self,'media\\Character/shooting_right.png')
     @stand_right.move_to(350, 445)
     @char = @stand_right
+    @bullet = Sprite.new(self, 'media\\bullet.png')
+    @bullet.hide
     # Game Detection
     @score = 0
     # Game Caption
@@ -42,6 +43,7 @@ class Game < Gosu::Window
     @walk_left.move_to(@char.x,@char.y)
     @shoot_left.move_to(@char.x, @char.y)
     @shoot_right.move_to(@char.x, @char.y)
+    @bullet.move_to(@char.x, @char.y)
     if @dir == :left then
       @char = @stand_left
     else
@@ -56,12 +58,15 @@ class Game < Gosu::Window
       @char.adjust_xpos(-4)
       @char = @walk_left
       @dir = :left
-    elsif button_down? KbW
-      @char.adjust_ypos(-10) # Idk why we need this?
-    elsif button_down? KbSpace and @dir == :left
-      @char = @shoot_left
-    elsif button_down? KbSpace and @dir == :right
-      @char = @shoot_right
+    elsif button_down? KbSpace # Shooting
+      @bullet.show
+      if @dir == :left
+      @char = @shooting_left
+      @bullet.adjust_xpos(-10)
+      else
+      @char = @shooting_right
+      @bullet.adjust_xpos(10)
+      end
     end
    end
    #END
