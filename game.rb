@@ -1,6 +1,6 @@
 require 'Gosu'
-require 'Sprite'
-require 'Background'
+require_relative 'Sprite'
+require_relative 'Background'
 
 include Gosu
 
@@ -10,19 +10,18 @@ class Game < Gosu::Window
     super(800, 600, false)
     # Backgrounds / Cursor
     @cursor = Gosu::Image.new(self, 'media/cursor.png')
-    @menu = Background.new(self, 'media\\menu.png')
-    @title = Sprite.new(self, 'media\\title.png')
+    @menu = Background.new(self, 'media/menu.png')
+    @title = Sprite.new(self, 'media/title.png')
     # Character
-    @stand_left = Sprite.new(self,'media\\Character/stand_left.png')
-    @stand_right = Sprite.new(self,'media\\Character/stand_right.png')
-    @walk_left = Sprite.new(self,'media\\Character/walk_left.png')
-    @walk_right = Sprite.new(self,'media\\Character/walk_right.png')
-    @shoot_left = Sprite.new(self,'media\\Character/shooting_left.png')
-    @shoot_right = Sprite.new(self,'media\\Character/shooting_right.png')
+    @stand_left = Sprite.new(self,'media/Character/stand_left.png')
+    @stand_right = Sprite.new(self,'media/Character/stand_right.png')
+    @walk_left = Sprite.new(self,'media/Character/walk_left.png')
+    @walk_right = Sprite.new(self,'media/Character/walk_right.png')
+    @shoot_left = Sprite.new(self,'media/Character/shooting_left.png')
+    @shoot_right = Sprite.new(self,'media/Character/shooting_right.png')
     @stand_right.move_to(350, 445)
     @char = @stand_right
-    @bullet = Sprite.new(self, 'media\\bullet.png')
-    @bullet.hide
+    @bullet = Sprite.new(self, 'media/bullet.png')
     # Game Detection
     @score = 0
     # Game Caption
@@ -46,26 +45,28 @@ class Game < Gosu::Window
     @bullet.move_to(@char.x, @char.y)
     if @dir == :left then
       @char = @stand_left
-    else
+    elsif @dir == :right then
       @char = @stand_right
     end
     # Movement
-    if button_down? KbD
-      @char.adjust_xpos 4
+    if button_down? KbD then
       @char = @walk_right
       @dir = :right
-    elsif button_down? KbA
-      @char.adjust_xpos -4
+      @char.adjust_xpos 4
+    elsif button_down? KbA then
       @char = @walk_left
       @dir = :left
+      @char.adjust_xpos -4
     elsif button_down? KbSpace # Shooting
       @bullet.show
-      if @dir == :left
+      if @dir == :left then
       @char = @shooting_left
-      @bullet.adjust_xpos -10
-      else
+      @bullet.adjust_xpos(-10)
+      elsif @dir == :right then
       @char = @shooting_right
       @bullet.adjust_xpos 10
+      else
+      @bullet.hide
       end
     end
    end
