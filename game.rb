@@ -51,12 +51,12 @@ class Game < Gosu::Window
     end
     # Movement
     if button_down? KbD
-      @char.adjust_xpos 4
       @char = @walk_right
+      @char.adjust_xpos(4)
       @dir = :right
     elsif button_down? KbA
-      @char.adjust_xpos -4
       @char = @walk_left
+      @char.adjust_xpos(-4)
       @dir = :left
     elsif button_down? KbSpace # Shooting
       @bullet.show
