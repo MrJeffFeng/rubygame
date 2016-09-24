@@ -22,8 +22,10 @@ class Game < Gosu::Window
     @stand_right.move_to(350, 445)
     @char = @stand_right
     @bullet = Sprite.new(self, 'media/bullet.png')
+    @bullet.hide
     # Game Detection
     @score = 0
+    @Shooting = false
     # Game Caption
     self.caption = "Zombie Shooter - Alpha - 0.1.0"
   end
@@ -42,7 +44,6 @@ class Game < Gosu::Window
     @walk_left.move_to(@char.x,@char.y)
     @shoot_left.move_to(@char.x, @char.y)
     @shoot_right.move_to(@char.x, @char.y)
-    @bullet.move_to(@char.x, @char.y)
     if @dir == :left then
       @char = @stand_left
     elsif @dir == :right then
@@ -58,17 +59,29 @@ class Game < Gosu::Window
       @dir = :left
       @char.adjust_xpos -4
     elsif button_down? KbSpace # Shooting
-      @bullet.show
+      @shooting = true
       if @dir == :left then
-      @char = @shooting_left
-      @bullet.adjust_xpos(-10)
+        @bullet.move_to(@char.x, @char.y + 30)
+        @char = @shoot_left
+        5.times do
+          @bullet.adjust_xpos -30
+        end
       elsif @dir == :right then
-      @char = @shooting_right
-      @bullet.adjust_xpos 10
-      else
-      @bullet.hide
+        @bullet.move_to(@char.x + 50, @char.y + 30)
+        @char = @shoot_right
+        5.times do
+          @bullet.adjust_xpos 30
+        end
       end
+    else
+      @shooting = false
     end
+   end
+
+   if @shooting then
+     @bullet.show
+   else
+     @bullet.hide
    end
    # Close Window
    close if button_down? KbEscape
