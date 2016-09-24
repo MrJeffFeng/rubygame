@@ -25,7 +25,7 @@ class Game < Gosu::Window
     @bullet.hide
     # Game Detection
     @score = 0
-    @Shooting = false
+    @shooting = false
     # Game Caption
     self.caption = "Zombie Shooter - Alpha - 0.1.0"
   end
@@ -44,34 +44,32 @@ class Game < Gosu::Window
     @walk_left.move_to(@char.x,@char.y)
     @shoot_left.move_to(@char.x, @char.y)
     @shoot_right.move_to(@char.x, @char.y)
+    
     if @dir == :left then
       @char = @stand_left
     elsif @dir == :right then
       @char = @stand_right
     end
+    
     # Movement
     if button_down? KbD then
       @char = @walk_right
       @dir = :right
       @char.adjust_xpos 4
+      @bullet.move_to(@char.x + 50, @char.y + 30)
     elsif button_down? KbA then
       @char = @walk_left
       @dir = :left
       @char.adjust_xpos -4
-    elsif button_down? KbSpace # Shooting
+      @bullet.move_to(@char.x + 50, @char.y + 30)
+    elsif button_down? KbSpace ############################# Shooting
       @shooting = true
       if @dir == :left then
-        @bullet.move_to(@char.x, @char.y + 30)
         @char = @shoot_left
-        5.times do
-          @bullet.adjust_xpos -30
-        end
+        @bullet.adjust_xpos -30
       elsif @dir == :right then
-        @bullet.move_to(@char.x + 50, @char.y + 30)
         @char = @shoot_right
-        5.times do
-          @bullet.adjust_xpos 30
-        end
+        @bullet.adjust_xpos 30
       end
     else
       @shooting = false
@@ -82,6 +80,7 @@ class Game < Gosu::Window
      @bullet.show
    else
      @bullet.hide
+     @bullet.move_to(@char.x + 50, @char.y + 30) #If I ditn't put it here then it would move it to the sprites position even when shooting, so this adjusts after done shooting
    end
    # Close Window
    close if button_down? KbEscape
