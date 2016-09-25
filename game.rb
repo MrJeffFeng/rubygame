@@ -21,8 +21,8 @@ class Game < Gosu::Window
     @shoot_right = Sprite.new(self,'media/Character/shooting_right.png')
     @stand_right.move_to(350, 445)
     @char = @stand_right
-    @bullet = Sprite.new(self, 'media/bullet.png')
-    @bullet.hide
+    @bullet = Array.new
+    @dir = :right
     # Game Detection
     @score = 0
     @shooting = false
@@ -44,44 +44,55 @@ class Game < Gosu::Window
     @walk_left.move_to(@char.x,@char.y)
     @shoot_left.move_to(@char.x, @char.y)
     @shoot_right.move_to(@char.x, @char.y)
-    
+
     if @dir == :left then
       @char = @stand_left
     elsif @dir == :right then
       @char = @stand_right
     end
-    
+
     # Movement
     if button_down? KbD then
       @char = @walk_right
       @dir = :right
       @char.adjust_xpos 4
-      @bullet.move_to(@char.x + 50, @char.y + 30)
     elsif button_down? KbA then
       @char = @walk_left
       @dir = :left
       @char.adjust_xpos -4
-      @bullet.move_to(@char.x + 50, @char.y + 30)
-    elsif button_down? KbSpace ############################# Shooting
+    elsif button_down? KbSpace # Shooting
       @shooting = true
       if @dir == :left then
         @char = @shoot_left
-        @bullet.adjust_xpos -30
       elsif @dir == :right then
         @char = @shoot_right
-        @bullet.adjust_xpos 30
       end
     else
       @shooting = false
     end
    end
-
+   # Bullet
    if @shooting then
-     @bullet.show
-   else
-     @bullet.hide
-     @bullet.move_to(@char.x + 50, @char.y + 30) #If I ditn't put it here then it would move it to the sprites position even when shooting, so this adjusts after done shooting
+     bullet = Sprite.new(self, 'media/bullet.png')
+     bullet.move_to(@char.x + 50, @char.y + 30)
+     @bullet << bullet
+     if @dir == :left
+      @bullet.each do |bullet|
+      bullet.adjust_xpos -20
+      end
+     elsif @dir == :right
+       @bullet.each do |bullet|
+      bullet.adjust_xpos 20
+      end
+     end
    end
+   # Wall
+   if @char.x >= 730
+     @char.move_to(729, @char.y)
+   elsif @char.x <= 0
+     @char.move_to(1, @char.y)
+   end
+
    # Close Window
    close if button_down? KbEscape
    #END
@@ -90,7 +101,6 @@ class Game < Gosu::Window
   def draw
     @menu.see(0,0,0,1,1.25)
     @title.draw
-    @bullet.draw
     @char.draw
     @cursor.draw(self.mouse_x, self.mouse_y, 0)
   end
