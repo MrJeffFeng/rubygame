@@ -87,10 +87,10 @@ class Game < Gosu::Window
      end
    end
    # Wall
-   if @char.x >= 730
-     @char.move_to(729, @char.y)
-   elsif @char.x <= 0
-     @char.move_to(1, @char.y)
+   if @char.x >= 712
+     @char.move_to(711, @char.y)
+   elsif @char.x <= -10
+     @char.move_to(-9, @char.y)
    end
 
    # Close Window
