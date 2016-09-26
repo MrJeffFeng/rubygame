@@ -25,6 +25,7 @@ class Game < Gosu::Window
     @dir = :right
     # Game Detection
     @score = 0
+    @ammo = 12
     @shooting = false
     # Game Caption
     self.caption = "Zombie Shooter - Alpha - 0.1.0"
@@ -62,6 +63,7 @@ class Game < Gosu::Window
       @char.adjust_xpos -4
     elsif button_down? KbSpace # Shooting
       @shooting = true
+      @ammo -= 1
       if @dir == :left then
         @char = @shoot_left
       elsif @dir == :right then
@@ -72,20 +74,21 @@ class Game < Gosu::Window
     end
    end
    # Bullet
-   if @shooting then
+   if @shooting and @ammo >= 0 then
      bullet = Sprite.new(self, 'media/bullet.png')
      bullet.move_to(@char.x + 50, @char.y + 30)
      @bullet << bullet
-     if @dir == :left
-      @bullet.each do |bullet|
-      bullet.adjust_xpos -20
-      end
-     elsif @dir == :right
-       @bullet.each do |bullet|
-      bullet.adjust_xpos 20
-      end
-     end
    end
+   if @dir == :left
+    @bullet.each do |bullet|
+    bullet.adjust_xpos -20
+    end
+   elsif @dir == :right
+     @bullet.each do |bullet|
+    bullet.adjust_xpos 20
+    end
+   end
+   p "#{@ammo}"
    # Wall
    if @char.x >= 712
      @char.move_to(711, @char.y)
@@ -101,6 +104,11 @@ class Game < Gosu::Window
   def draw
     @menu.see(0,0,0,1,1.25)
     @title.draw
+    if @shooting
+      @bullet.each do |bullet|
+      bullet.draw
+      end
+    end
     @char.draw
     @cursor.draw(self.mouse_x, self.mouse_y, 0)
   end
