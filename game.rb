@@ -25,8 +25,10 @@ class Game < Gosu::Window
     @dir = :right
     # Game Detection
     @score = 0
-    @ammo = 12
+    @ammo = 20
     @shooting = false
+    # Font
+    @text = Font.new(self, default_font_name, 20)
     # Game Caption
     self.caption = "Zombie Shooter - Alpha - 0.1.0"
   end
@@ -102,17 +104,18 @@ class Game < Gosu::Window
   def draw
     @menu.see(0,0,0,1,1.25)
     @title.draw
-      @bullet.each do |bullet|
-      bullet.draw
-      if bullet.x > 750
-       @bullet.delete(bullet)
-       @shooting = false
-      elsif bullet.x < 10
-       @bullet.delete(bullet)
-       @shooting = false
-      end
+    @bullet.each do |bullet|
+    bullet.draw
+    if bullet.x > 750
+     @bullet.delete(bullet)
+     @shooting = false
+    elsif bullet.x < 10
+     @bullet.delete(bullet)
+     @shooting = false
+    end
     end
     @char.draw
+    @text.draw("Ammo: #{@ammo}", 1, 0, 0)
     @cursor.draw(self.mouse_x, self.mouse_y, 0)
   end
 end
