@@ -53,40 +53,38 @@ class Game < Gosu::Window
     end
 
     # Movement
-    if button_down? KbD then
+    if button_down? KbD and @shooting == false
       @char = @walk_right
       @dir = :right
       @char.adjust_xpos 4
-    elsif button_down? KbA then
+    elsif button_down? KbA and @shooting == false
       @char = @walk_left
       @dir = :left
       @char.adjust_xpos -4
-    elsif button_down? KbSpace # Shooting
+    elsif button_down? KbSpace and @ammo > 0 and @shooting == false# Shooting
       @shooting = true
       @ammo -= 1
+      bullet = Sprite.new(self, 'media/bullet.png')
+      bullet.move_to(@char.x + 50, @char.y + 30)
+      @bullet << bullet
       if @dir == :left then
         @char = @shoot_left
       elsif @dir == :right then
         @char = @shoot_right
       end
-    else
-      @shooting = false
     end
    end
    # Bullet
    if @shooting and @ammo >= 0 then
-     bullet = Sprite.new(self, 'media/bullet.png')
-     bullet.move_to(@char.x + 50, @char.y + 30)
-     @bullet << bullet
-   end
-   if @dir == :left
-    @bullet.each do |bullet|
-    bullet.adjust_xpos -20
-    end
-   elsif @dir == :right
-     @bullet.each do |bullet|
-    bullet.adjust_xpos 20
-    end
+     if @dir == :left
+      @bullet.each do |bullet|
+      bullet.adjust_xpos -20
+      end
+     elsif @dir == :right
+       @bullet.each do |bullet|
+      bullet.adjust_xpos 20
+      end
+     end
    end
    p "#{@ammo}"
    # Wall
@@ -104,9 +102,14 @@ class Game < Gosu::Window
   def draw
     @menu.see(0,0,0,1,1.25)
     @title.draw
-    if @shooting
       @bullet.each do |bullet|
       bullet.draw
+      if bullet.x > 750
+       @bullet.delete(bullet)
+       @shooting = false
+      elsif bullet.x < 10
+       @bullet.delete(bullet)
+       @shooting = false
       end
     end
     @char.draw
