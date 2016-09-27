@@ -3,6 +3,8 @@ require_relative 'Sprite'
 require_relative 'Background'
 
 include Gosu
+LEFT = 1
+RIGHT = 2
 
 class Game < Gosu::Window
   def initialize
@@ -82,19 +84,23 @@ class Game < Gosu::Window
       end
       # Zombie
       if @counter == 1
-        zombie_right = Sprite.new(self, "media/Zombie/stand_right.png")
-        zombie_right.move_to(0, 430)
+        zombie = Zombie.new(self, "media/Zombie/stand_right.png")
+        zombie.dir = RIGHT
+        zombie.move_to(0, 430)
+        @zombie << zombie
       elsif @counter == 100
-        zombie_left = Sprite.new(self, "media/Zombie/walk_left.png")
-        zombie_left.move_to(800, 430)
+        zombie = Zombie.new(self, "media/Zombie/stand_left.png")
+        zombie.dir = LEFT
+        zombie.move_to(800, 430)
+        @zombie << zombie
       end
-      @zombie << zombie_right << zombie_left
       # Zombie Movement
-      @zombie.each do |zombie_right|
-        zombie_right.adjust_xpos 0.1
-      end
-      @zombie.each do |zombie_left|
-        zombie_left.adjust_xpos -0.1
+      @zombie.each do |zombie|
+        if zombie.dir == RIGHT
+          zombie.adjust_xpos 1
+        elsif zombie.dir == LEFT
+          zombie.adjust_xpos -1
+        end
       end
     end # End @game_start
    # Bullet
@@ -113,6 +119,7 @@ class Game < Gosu::Window
    @bullet.each do |bullet|
      @zombie.each do |zombie|
        if bullet.touching? zombie
+         @score += 1
          @zombie.delete(zombie)
          @bullet.delete(bullet)
          @shooting = false
@@ -156,8 +163,19 @@ class Game < Gosu::Window
     @char.draw
     @text.draw("Ammo: #{@ammo}", 1, 0, 0)
     @text.draw("Lives: #{@lives}", 700, 0, 0)
+    @text.draw("Score: #{@score}", 350, 0, 0)
     @cursor.draw(self.mouse_x, self.mouse_y, 0)
   end
+end
+
+class Zombie < Sprite
+  attr_accessor :dir
+
+  def initialize(window, image)
+    @dir = LEFT
+    super window, image
+  end
+
 end
 
 Game.new.show
