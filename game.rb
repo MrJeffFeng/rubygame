@@ -51,7 +51,7 @@ class Game < Gosu::Window
       @walk_left.move_to(@char.x,@char.y)
       @shoot_left.move_to(@char.x, @char.y)
       @shoot_right.move_to(@char.x, @char.y)
-      @counter = rand(1..200)
+      @counter = rand(1..300)
       p "#{@counter}"
       # Switches sprite base on side
       if @dir == :left then
@@ -81,30 +81,42 @@ class Game < Gosu::Window
         end
       end
       # Zombie
-      if @counter == 18
-        zombie = Sprite.new(self, "media/Zombie/walk_right.png")
-        zombie.move_to(0, 445)
-        @zombie << zombie
-      #elsif @counter == 100
-      #  zombie_left = Sprite.new(self, "media/Zombie/walk_left.png")
-      #  zombie_left.move_to(800, 445)
-      #  @zombie << zombie_left
+      if @counter == 1
+        zombie_right = Sprite.new(self, "media/Zombie/stand_right.png")
+        zombie_right.move_to(0, 430)
+      elsif @counter == 100
+        zombie_left = Sprite.new(self, "media/Zombie/walk_left.png")
+        zombie_left.move_to(800, 430)
       end
+      @zombie << zombie_right << zombie_left
       # Zombie Movement
-      @zombie.each do |zombie|
-        zombie.adjust_xpos 3
+      @zombie.each do |zombie_right|
+        zombie_right.adjust_xpos 0.1
+      end
+      @zombie.each do |zombie_left|
+        zombie_left.adjust_xpos -0.1
       end
     end # End @game_start
    # Bullet
    if @shooting and @ammo >= 0 then
      if @dir == :left
       @bullet.each do |bullet|
-      bullet.adjust_xpos -20
+        bullet.adjust_xpos -20
       end
      elsif @dir == :right
        @bullet.each do |bullet|
-      bullet.adjust_xpos 20
+         bullet.adjust_xpos 20
       end
+     end
+   end
+   # Bullet Detection
+   @bullet.each do |bullet|
+     @zombie.each do |zombie|
+       if bullet.touching? zombie
+         @zombie.delete(zombie)
+         @bullet.delete(bullet)
+         @shooting = false
+       end
      end
    end
    # Wall
