@@ -1,10 +1,9 @@
 require 'Gosu'
 require_relative 'Sprite'
 require_relative 'Background'
+#require_relative 'Crate'
 
 include Gosu
-LEFT = 1
-RIGHT = 2
 
 class Game < Gosu::Window
   def initialize
@@ -27,16 +26,19 @@ class Game < Gosu::Window
     # Bullets / Zombie
     @bullet = Array.new
     @zombie = Array.new
+    @crates = Array.new
     # Game Detection
     @score = 0
     @ammo = 20
     @counter = 0
-    @lives = 3
+    @lives = 150
+    @cooldown = 0
     @shooting = false
+    @falling = false
     # Font
     @text = Font.new(self, default_font_name, 20)
     # Game Caption
-    self.caption = "Zombie Shooter - Alpha - 0.1.0"
+    self.caption = "Zombie Shooter - Alpha - 0.2.3"
   end
 
   def update
@@ -53,8 +55,8 @@ class Game < Gosu::Window
       @walk_left.move_to(@char.x,@char.y)
       @shoot_left.move_to(@char.x, @char.y)
       @shoot_right.move_to(@char.x, @char.y)
-      @counter = rand(1..300)
-      p "#{@counter}"
+      @counter = rand(1..400)
+      #@crate.update(self)
       # Switches sprite base on side
       if @dir == :left then
         @char = @stand_left
@@ -69,8 +71,8 @@ class Game < Gosu::Window
       elsif button_down? KbA and @shooting == false
         @char = @walk_left
         @dir = :left
-        @char.adjust_xpos -4
-      elsif button_down? KbSpace and @ammo > 0 and @shooting == false# Shooting
+        @char.adjust_xpos(-4)
+      elsif button_down? KbSpace and @ammo > 0 and @shooting == false # Shooting
         @shooting = true
         @ammo -= 1
         bullet = Sprite.new(self, 'media/bullet.png')
@@ -84,22 +86,49 @@ class Game < Gosu::Window
       end
       # Zombie
       if @counter == 1
-        zombie = Zombie.new(self, "media/Zombie/stand_right.png")
-        zombie.dir = RIGHT
-        zombie.move_to(0, 430)
+        zombie = Zombie.new(self, "media/Zombie/stand_right.png", :left)
+        zombie.move_to(-50, 440)
         @zombie << zombie
       elsif @counter == 100
-        zombie = Zombie.new(self, "media/Zombie/stand_left.png")
-        zombie.dir = LEFT
-        zombie.move_to(800, 430)
+        zombie = Zombie.new(self, "media/Zombie/stand_left.png", :right)
+        zombie.move_to(800, 440)
         @zombie << zombie
       end
       # Zombie Movement
       @zombie.each do |zombie|
-        if zombie.dir == RIGHT
+        if zombie.touching?(@char)
+          zombie.adjust_xpos 0
+          @lives -= 1
+        elsif zombie.dir == :left
           zombie.adjust_xpos 1
-        elsif zombie.dir == LEFT
-          zombie.adjust_xpos -1
+        elsif zombie.dir == :right
+          zombie.adjust_xpos(-1)
+        end
+      end
+      # Crate
+      if @counter == rand(0..300) and not @falling
+        crate = Sprite.new(self, "media/heart.png")
+        crate.move_to(rand(30..720), -10)
+        @crates << crate
+        @falling = true
+      end
+      # Crate Movement
+      @crates.each do |crate|
+        if @char.touching? crate
+          @lives += 50 if @lives < 150
+          @crates.delete(crate)
+          @falling = false
+          @cooldown = 0
+        elsif crate.y > 500
+          crate.adjust_ypos 0
+          @cooldown += 1
+            if @cooldown > 500
+              @crates.delete(crate)
+              @cooldown = 0
+              @falling = false
+            end
+        elsif crate.y <= 500
+          crate.adjust_ypos 1
         end
       end
     end # End @game_start
@@ -107,7 +136,7 @@ class Game < Gosu::Window
    if @shooting and @ammo >= 0 then
      if @dir == :left
       @bullet.each do |bullet|
-        bullet.adjust_xpos -20
+        bullet.adjust_xpos(-20)
       end
      elsif @dir == :right
        @bullet.each do |bullet|
@@ -123,6 +152,9 @@ class Game < Gosu::Window
          @zombie.delete(zombie)
          @bullet.delete(bullet)
          @shooting = false
+          if @counter.between?(rand(1.100),rand(100.200))
+            @ammo += 3
+          end
        end
      end
    end
@@ -153,14 +185,13 @@ class Game < Gosu::Window
     # Zombie Draw
     @zombie.each do |zombie|
       zombie.draw
-      if zombie.touching?(@char)
-        @lives -= 1
-      end
     end
-    #@zombie.each do |zombie_left|
-    #  zombie_left.draw
-    #end
+    # Crate Draw
+    @crates.each do |crate|
+      crate.draw
+    end
     @char.draw
+    # Text Draw
     @text.draw("Ammo: #{@ammo}", 1, 0, 0)
     @text.draw("Lives: #{@lives}", 700, 0, 0)
     @text.draw("Score: #{@score}", 350, 0, 0)
@@ -171,8 +202,8 @@ end
 class Zombie < Sprite
   attr_accessor :dir
 
-  def initialize(window, image)
-    @dir = LEFT
+  def initialize(window, image, dir)
+    @dir = dir
     super window, image
   end
 
