@@ -55,8 +55,7 @@ class Game < Gosu::Window
       @walk_left.move_to(@char.x,@char.y)
       @shoot_left.move_to(@char.x, @char.y)
       @shoot_right.move_to(@char.x, @char.y)
-      @counter = rand(1..400)
-      #@crate.update(self)
+      @counter = rand(1..200)
       # Switches sprite base on side
       if @dir == :left then
         @char = @stand_left
@@ -84,7 +83,7 @@ class Game < Gosu::Window
           @char = @shoot_right
         end
       end
-      # Zombie
+      # Zombie Spawning
       if @counter == 1
         zombie = Zombie.new(self, "media/Zombie/stand_right.png", :left)
         zombie.move_to(-50, 440)
@@ -100,29 +99,43 @@ class Game < Gosu::Window
           zombie.adjust_xpos 0
           @lives -= 1
         elsif zombie.dir == :left
-          zombie.adjust_xpos 1
+          zombie.adjust_xpos 3
         elsif zombie.dir == :right
-          zombie.adjust_xpos(-1)
+          zombie.adjust_xpos(-3)
         end
       end
       # Crate
-      if @counter == rand(0..300) and not @falling
-        crate = Sprite.new(self, "media/heart.png")
+      if @counter == 48 and not @falling
+        crate = Crate.new(self, "media/heart.png", :lives)
+        crate.move_to(rand(30..720), -10)
+        @crates << crate
+        @falling = true
+      elsif @counter == 90 and not @falling
+        crate = Crate.new(self, "media/ammo.png", :ammo)
         crate.move_to(rand(30..720), -10)
         @crates << crate
         @falling = true
       end
       # Crate Movement
       @crates.each do |crate|
-        if @char.touching? crate
+        if @char.touching? crate and crate.item == :lives
           @lives += 50 if @lives < 150
+          @crates.delete(crate)
+          @falling = false
+          @cooldown = 0
+        elsif @char.touching? crate and crate.item == :ammo
+          @ammo += 10 if @ammo < 50
           @crates.delete(crate)
           @falling = false
           @cooldown = 0
         elsif crate.y > 500
           crate.adjust_ypos 0
           @cooldown += 1
-            if @cooldown > 500
+            if crate.item == :lives and @cooldown > 500
+              @crates.delete(crate)
+              @cooldown = 0
+              @falling = false
+            elsif crate.item == :ammo and @cooldown > 200
               @crates.delete(crate)
               @cooldown = 0
               @falling = false
@@ -152,9 +165,6 @@ class Game < Gosu::Window
          @zombie.delete(zombie)
          @bullet.delete(bullet)
          @shooting = false
-          if @counter.between?(rand(1.100),rand(100.200))
-            @ammo += 3
-          end
        end
      end
    end
@@ -190,6 +200,10 @@ class Game < Gosu::Window
     @crates.each do |crate|
       crate.draw
     end
+    # Zombie Draw
+    @zombie.each do |zombie|
+      zombie.draw
+    end
     @char.draw
     # Text Draw
     @text.draw("Ammo: #{@ammo}", 1, 0, 0)
@@ -199,6 +213,15 @@ class Game < Gosu::Window
   end
 end
 
+class Crate < Sprite
+  attr_accessor :item
+  
+  def initialize(window, image, item)
+    @item = item
+  super window, image
+  end
+end 
+
 class Zombie < Sprite
   attr_accessor :dir
 
@@ -206,7 +229,6 @@ class Zombie < Sprite
     @dir = dir
     super window, image
   end
-
 end
 
 Game.new.show
