@@ -55,7 +55,7 @@ class Game < Gosu::Window
       @walk_right.move_to(@char.x,@char.y)
       @walk_left.move_to(@char.x,@char.y)
       @shoot_left.move_to(@char.x, @char.y)
-      
+
       @shoot_right.move_to(@char.x, @char.y)
       @counter = rand(1..250)
       # Switches sprite base on side
