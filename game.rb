@@ -1,9 +1,11 @@
 require 'Gosu'
+require 'win32/sound'
 require_relative 'Sprite'
 require_relative 'Background'
 #require_relative 'Crate'
 
 include Gosu
+include Win32
 
 class Game < Gosu::Window
   def initialize
@@ -13,6 +15,8 @@ class Game < Gosu::Window
     @cursor = Gosu::Image.new(self, 'media/cursor.png')
     @menu = Background.new(self, 'media/menu.png')
     @title = Sprite.new(self, 'media/title.png')
+    @no_ammo = Sprite.new(self, 'media/no_ammo_screen.png')
+    @no_ammo.hide
     @title.move_to(270,0)
     # Character
     @stand_left = Sprite.new(self,'media/Character/stand_left.png')
@@ -36,6 +40,9 @@ class Game < Gosu::Window
     @cooldown = 0
     @shooting = false
     @falling = false
+    # Game Sounds
+    @zombie_sound = Sample.new('media/Sounds/zombies.wav')
+    @gunshot = Sample.new('media/Sounds/gunshot.wav')
     # Font
     @text = Font.new(self, default_font_name, 20)
     # Game Caption
@@ -45,6 +52,7 @@ class Game < Gosu::Window
   def update
     # Start Game
     if button_down? KbReturn
+      Sound.play('media/Sounds/zombies.wav', Sound::ASYNC | Sound::LOOP)
       @game_start = true
         @title.hide
     end
@@ -55,10 +63,9 @@ class Game < Gosu::Window
       @walk_right.move_to(@char.x,@char.y)
       @walk_left.move_to(@char.x,@char.y)
       @shoot_left.move_to(@char.x, @char.y)
-
       @shoot_right.move_to(@char.x, @char.y)
-      @counter = rand(1..250)
-      # Switches sprite base on side
+      @counter = rand(1..300)
+      # Switches sprite based on side
       if @dir == :left then
         @char = @stand_left
       elsif @dir == :right then
@@ -66,6 +73,7 @@ class Game < Gosu::Window
       end
       # Movement
       if button_down? KbSpace and @ammo > 0 and @shooting == false # Shooting
+        @gunshot.play
         @shooting = true
         @ammo -= 1
         bullet = Sprite.new(self, 'media/bullet.png')
@@ -76,6 +84,8 @@ class Game < Gosu::Window
         elsif @dir == :right then
           @char = @shoot_right
         end
+      elsif button_down? KbSpace and @ammo == 0
+        @no_ammo.show
       elsif (button_down? KbD or button_down? KbRight) and @shooting == false
         @char = @walk_right
         @dir = :right
@@ -107,12 +117,12 @@ class Game < Gosu::Window
         end
       end
       # Crate
-      if @counter == 48 and not @falling
+      if @counter == 48 and not @falling and @lives < 90
         crate = Crate.new(self, "media/heart.png", :lives)
         crate.move_to(rand(30..1250), -10)
         @crates << crate
         @falling = true
-      elsif @counter == 90 or @counter == 45 and not @falling #having to counters makes frequency increase
+      elsif @counter == 90 and not @falling and @ammo <= 10
         crate = Crate.new(self, "media/ammo.png", :ammo)
         crate.move_to(rand(30..1250), -10)
         @crates << crate
@@ -129,6 +139,7 @@ class Game < Gosu::Window
           @falling = false
           @cooldown = 0
         elsif @char.touching? crate and crate.item == :ammo
+          @no_ammo.hide
           @ammo += 5 if @ammo < 50
           if @ammo > 50 #makes ammo equal to 50 if it goes above it
             @ammo = 50
@@ -153,7 +164,7 @@ class Game < Gosu::Window
         end
       end
     end # End @game_start
-   # Bullet
+   # Shooting
    if @shooting and @ammo >= 0 then
      if @dir == :left
       @bullet.each do |bullet|
@@ -164,6 +175,8 @@ class Game < Gosu::Window
          bullet.adjust_xpos 20
       end
      end
+   elsif @shooting and @ammo == 0
+     @no_ammo.show
    end
    # Bullet Detection
    @bullet.each do |bullet|
@@ -208,6 +221,7 @@ class Game < Gosu::Window
     @crates.each do |crate|
       crate.draw
     end
+    @no_ammo.draw
     @char.draw
     # Text Draw
     @text.draw("Ammo: #{@ammo}", 1, 0, 0)
@@ -219,12 +233,12 @@ end
 
 class Crate < Sprite
   attr_accessor :item
-
+  
   def initialize(window, image, item)
     @item = item
   super window, image
   end
-end
+end 
 
 class Zombie < Sprite
   attr_accessor :dir
