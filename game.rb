@@ -215,12 +215,12 @@ end
 
 class Crate < Sprite
   attr_accessor :item
-  
+
   def initialize(window, image, item)
     @item = item
   super window, image
   end
-end 
+end
 
 class Zombie < Sprite
   attr_accessor :dir
