@@ -1,11 +1,11 @@
 require 'Gosu'
-require 'win32/sound'
+#require 'win32/sound'
 require_relative 'Sprite'
 require_relative 'Background'
 #require_relative 'Crate'
 
 include Gosu
-include Win32
+#include Win32
 
 class Game < Gosu::Window
   def initialize
@@ -28,10 +28,20 @@ class Game < Gosu::Window
     @stand_right.move_to(640, 445)
     @char = @stand_right
     @dir = :right
-    # Bullets / Zombie
+    # Bullets / Zombie / Crates
     @bullet = Array.new
     @zombie = Array.new
     @crates = Array.new
+    # Health
+    @health1 = Sprite.new(self, 'media/heart.png')
+    @health2 = Sprite.new(self, 'media/heart.png')
+    @health3 = Sprite.new(self, 'media/heart.png')
+    @health1.move_to(1160, 0)
+    @health2.move_to(1200, 0)
+    @health3.move_to(1240, 0)
+    @health1.hide
+    @health2.hide
+    @health3.hide
     # Game Detection
     @score = 0
     @ammo = 12
@@ -41,8 +51,8 @@ class Game < Gosu::Window
     @shooting = false
     @falling = false
     # Game Sounds
-    @zombie_sound = Sample.new('media/Sounds/zombies.wav')
-    @gunshot = Sample.new('media/Sounds/gunshot.wav')
+    #@zombie_sound = Sample.new('media/Sounds/zombies.wav')
+    #@gunshot = Sample.new('media/Sounds/gunshot.wav')
     # Font
     @text = Font.new(self, default_font_name, 20)
     # Game Caption
@@ -52,7 +62,7 @@ class Game < Gosu::Window
   def update
     # Start Game
     if button_down? KbReturn
-      Sound.play('media/Sounds/zombies.wav', Sound::ASYNC | Sound::LOOP)
+      #Sound.play('media/Sounds/zombies.wav', Sound::ASYNC | Sound::LOOP)
       @game_start = true
         @title.hide
     end
@@ -73,7 +83,7 @@ class Game < Gosu::Window
       end
       # Movement
       if button_down? KbSpace and @ammo > 0 and @shooting == false # Shooting
-        @gunshot.play
+        #@gunshot.play
         @shooting = true
         @ammo -= 1
         bullet = Sprite.new(self, 'media/bullet.png')
@@ -163,6 +173,21 @@ class Game < Gosu::Window
           crate.adjust_ypos 2
         end
       end
+      # Health
+      if @lives <= 30 and @lives > 0
+        @health2.hide
+      elsif @lives <= 60 and @lives > 30
+        @health1.hide
+        @health2.show
+      elsif @lives <= 90 and @lives > 60
+        @health1.show
+        @health2.show
+        @health3.show
+      elsif @lives <= 0
+        @health1.hide
+        @health2.hide
+        @health3.hide
+      end
     end # End @game_start
    # Shooting
    if @shooting and @ammo >= 0 then
@@ -223,6 +248,10 @@ class Game < Gosu::Window
     end
     @no_ammo.draw
     @char.draw
+    # Health Draw
+    @health1.draw
+    @health2.draw
+    @health3.draw
     # Text Draw
     @text.draw("Ammo: #{@ammo}", 1, 0, 0)
     @text.draw("Lives: #{@lives}", 1180, 0, 0)
@@ -233,12 +262,12 @@ end
 
 class Crate < Sprite
   attr_accessor :item
-  
+
   def initialize(window, image, item)
     @item = item
   super window, image
   end
-end 
+end
 
 class Zombie < Sprite
   attr_accessor :dir
