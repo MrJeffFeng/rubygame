@@ -70,7 +70,7 @@ class Game < Gosu::Window
     # Font
     @text = Font.new(self, default_font_name, 30)
     # Game Caption
-    self.caption = "Zombie Gate - Beta - 0.3.2"
+    self.caption = "Zombie Gate - Beta - 0.1.0"
   end
 
   def update
@@ -122,11 +122,11 @@ class Game < Gosu::Window
         @char.adjust_xpos(-7)
       end
       # Zombie Spawning
-      if @counter.between?(3,(@score / 30) + 3)
+      if @counter.between?(3,(@score / 25) + 3)
         zombie = Zombie.new(self, "media/Zombie/stand_right.png", :left)
         zombie.move_to(-50, 440)
         @zombie << zombie
-      elsif @counter.between?(100,(@score / 30) + 100)
+      elsif @counter.between?(100,(@score / 25) + 100)
         zombie = Zombie.new(self, "media/Zombie/stand_left.png", :right)
         zombie.move_to(1280, 440)
         @zombie << zombie
