@@ -17,6 +17,8 @@ class Game < Gosu::Window
     @title = Sprite.new(self, 'media/title.png')
     @no_ammo = Sprite.new(self, 'media/no_ammo_screen.png')
     @no_ammo.hide
+    @game_over = Sprite.new(self, 'media/game_over.png')
+    @game_over.hide
     @title.move_to(270,0)
     # Character
     @stand_left = Sprite.new(self,'media/Character/stand_left.png')
@@ -39,9 +41,6 @@ class Game < Gosu::Window
     @health1.move_to(1160, 0)
     @health2.move_to(1200, 0)
     @health3.move_to(1240, 0)
-    @health1.hide
-    @health2.hide
-    @health3.hide
     # Game Detection
     @score = 0
     @ammo = 12
@@ -53,10 +52,11 @@ class Game < Gosu::Window
     # Game Sounds
     #@zombie_sound = Sample.new('media/Sounds/zombies.wav')
     #@gunshot = Sample.new('media/Sounds/gunshot.wav')
+    #@click = Sample.new('media/Sounds/no_ammo.wav')
     # Font
     @text = Font.new(self, default_font_name, 20)
     # Game Caption
-    self.caption = "Zombie Shooter - Alpha - 0.2.3"
+    self.caption = "Zombie Gate - Beta - 0.3.1"
   end
 
   def update
@@ -64,8 +64,9 @@ class Game < Gosu::Window
     if button_down? KbReturn
       #Sound.play('media/Sounds/zombies.wav', Sound::ASYNC | Sound::LOOP)
       @game_start = true
-        @title.hide
+      @title.hide
     end
+
     # Updates Sprites
     if @game_start
       @stand_left.move_to(@char.x,@char.y)
@@ -99,18 +100,18 @@ class Game < Gosu::Window
       elsif (button_down? KbD or button_down? KbRight) and @shooting == false
         @char = @walk_right
         @dir = :right
-        @char.adjust_xpos 6
+        @char.adjust_xpos 7
       elsif (button_down? KbA or button_down? KbLeft) and @shooting == false
         @char = @walk_left
         @dir = :left
-        @char.adjust_xpos(-6)
+        @char.adjust_xpos(-7)
       end
       # Zombie Spawning
-      if @counter == 1
+      if @counter.between?(1,2)
         zombie = Zombie.new(self, "media/Zombie/stand_right.png", :left)
         zombie.move_to(-50, 440)
         @zombie << zombie
-      elsif @counter == 100
+      elsif @counter.between?(100,102)
         zombie = Zombie.new(self, "media/Zombie/stand_left.png", :right)
         zombie.move_to(1280, 440)
         @zombie << zombie
@@ -121,9 +122,9 @@ class Game < Gosu::Window
           zombie.adjust_xpos 0
           @lives -= 1
         elsif zombie.dir == :left
-          zombie.adjust_xpos 5
+            zombie.adjust_xpos((@score / 30) + 3)
         elsif zombie.dir == :right
-          zombie.adjust_xpos(-5)
+            zombie.adjust_xpos((@score / -30) - 3)
         end
       end
       # Crate
@@ -150,7 +151,7 @@ class Game < Gosu::Window
           @cooldown = 0
         elsif @char.touching? crate and crate.item == :ammo
           @no_ammo.hide
-          @ammo += 5 if @ammo < 50
+          @ammo += 10 if @ammo < 50
           if @ammo > 50 #makes ammo equal to 50 if it goes above it
             @ammo = 50
           end
@@ -220,6 +221,11 @@ class Game < Gosu::Window
    elsif @char.x <= -10
      @char.move_to(-9, @char.y)
    end
+   # Game Over
+   if @lives < 0
+      @game_over.show
+      @game_start = false
+   end
    # Close Window
    close if button_down? KbEscape
   end # End update
@@ -254,9 +260,10 @@ class Game < Gosu::Window
     @health3.draw
     # Text Draw
     @text.draw("Ammo: #{@ammo}", 1, 0, 0)
-    @text.draw("Lives: #{@lives}", 1180, 0, 0)
+    #@text.draw("Lives: #{@lives}", 1180, 0, 0)
     @text.draw("Score: #{@score}", 640, 0, 0)
     @cursor.draw(self.mouse_x, self.mouse_y, 0)
+    @game_over.draw
   end
 end
 
