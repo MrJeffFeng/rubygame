@@ -70,7 +70,7 @@ class Game < Gosu::Window
     # Font
     @text = Font.new(self, default_font_name, 30)
     # Game Caption
-    self.caption = "Zombie Gate - Beta - 0.3.2"
+    self.caption = "Zombie Gate - Beta - 0.1.0"
   end
 
   def update
