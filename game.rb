@@ -1,10 +1,10 @@
 require 'Gosu'
-#require 'win32/sound'
+require 'win32/sound'
 require_relative 'Sprite'
 require_relative 'Background'
 
 include Gosu
-#include Win32
+include Win32
 
 class Crate < Sprite # Crate Class
   attr_accessor :item
@@ -64,9 +64,9 @@ class Game < Gosu::Window
     @shooting = false
     @falling = false
     # Game Sounds
-    #@zombie_sound = Sample.new('media/Sounds/zombies.wav')
-    #@gunshot = Sample.new('media/Sounds/gunshot.wav')
-    #@click = Sample.new('media/Sounds/no_ammo.wav')
+    @zombie_sound = Sample.new('media/Sounds/zombies.wav')
+    @gunshot = Sample.new('media/Sounds/gunshot.wav')
+    @click = Sample.new('media/Sounds/no_ammo.wav')
     # Font
     @text = Font.new(self, default_font_name, 30)
     # Game Caption
@@ -76,7 +76,7 @@ class Game < Gosu::Window
   def update
     # Start Game
     if button_down? KbReturn and !@game_start
-      #Sound.play('media/Sounds/zombies.wav', Sound::ASYNC | Sound::LOOP)
+      Sound.play('media/Sounds/zombies.wav', Sound::ASYNC | Sound::LOOP)
       @game_start = true
       @title.hide
       reset
