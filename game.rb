@@ -43,7 +43,7 @@ class Game < Gosu::Window
     @health3.move_to(1245, 0)
     # Game Detection
     @score = 0
-    @ammo = 12
+    @ammo = 20
     @counter = 0
     @lives = 90
     @cooldown = 0
@@ -54,7 +54,7 @@ class Game < Gosu::Window
     #@gunshot = Sample.new('media/Sounds/gunshot.wav')
     #@click = Sample.new('media/Sounds/no_ammo.wav')
     # Font
-    @text = Font.new(self, default_font_name, 20)
+    @text = Font.new(self, default_font_name, 30)
     # Game Caption
     self.caption = "Zombie Gate - Beta - 0.3.1"
   end
@@ -75,7 +75,7 @@ class Game < Gosu::Window
       @walk_left.move_to(@char.x,@char.y)
       @shoot_left.move_to(@char.x, @char.y)
       @shoot_right.move_to(@char.x, @char.y)
-      @counter = rand(1..300)
+      @counter = rand(1..200)
       # Switches sprite based on side
       if @dir == :left then
         @char = @stand_left
@@ -122,9 +122,9 @@ class Game < Gosu::Window
           zombie.adjust_xpos 0
           @lives -= 1
         elsif zombie.dir == :left
-            zombie.adjust_xpos((@score / 30) + 3)
+            zombie.adjust_xpos((@score / 5) + 3)
         elsif zombie.dir == :right
-            zombie.adjust_xpos((@score / -30) - 3)
+            zombie.adjust_xpos((@score / -5) - 3)
         end
       end
       # Crate
@@ -133,7 +133,7 @@ class Game < Gosu::Window
         crate.move_to(rand(30..1250), -10)
         @crates << crate
         @falling = true
-      elsif @counter.between?(4,10) and not @falling and @ammo <= 10
+      elsif @counter.between?(4,10) and not @falling and @ammo <= 18
         crate = Crate.new(self, "media/ammo.png", :ammo)
         crate.move_to(rand(30..1250), -10)
         @crates << crate
