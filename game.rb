@@ -2,17 +2,31 @@ require 'Gosu'
 #require 'win32/sound'
 require_relative 'Sprite'
 require_relative 'Background'
-#require_relative 'Crate'
 
 include Gosu
 #include Win32
+
+class Crate < Sprite # Crate Class
+  attr_accessor :item
+  def initialize(window, image, item)
+    @item = item
+  super window, image
+  end
+end
+
+class Zombie < Sprite # Zombie Class
+  attr_accessor :dir
+  def initialize(window, image, dir)
+    @dir = dir
+    super window, image
+  end
+end
 
 class Game < Gosu::Window
   def initialize
     # Game Window
     super(1280, 600, false)
     # Backgrounds / Cursor
-    @cursor = Gosu::Image.new(self, 'media/cursor.png')
     @menu = Background.new(self, 'media/menu.png')
     @title = Sprite.new(self, 'media/title.png')
     @no_ammo = Sprite.new(self, 'media/no_ammo_screen.png')
@@ -56,15 +70,16 @@ class Game < Gosu::Window
     # Font
     @text = Font.new(self, default_font_name, 30)
     # Game Caption
-    self.caption = "Zombie Gate - Beta - 0.3.1"
+    self.caption = "Zombie Gate - Beta - 0.3.2"
   end
 
   def update
     # Start Game
-    if button_down? KbReturn
+    if button_down? KbReturn and !@game_start
       #Sound.play('media/Sounds/zombies.wav', Sound::ASYNC | Sound::LOOP)
       @game_start = true
       @title.hide
+      reset
     end
 
     # Updates Sprites
@@ -75,7 +90,7 @@ class Game < Gosu::Window
       @walk_left.move_to(@char.x,@char.y)
       @shoot_left.move_to(@char.x, @char.y)
       @shoot_right.move_to(@char.x, @char.y)
-      @counter = rand(1..200)
+      @counter = rand(1..300)
       # Switches sprite based on side
       if @dir == :left then
         @char = @stand_left
@@ -107,11 +122,11 @@ class Game < Gosu::Window
         @char.adjust_xpos(-7)
       end
       # Zombie Spawning
-      if @counter.between?(3,4)
+      if @counter.between?(3,(@score / 30) + 3)
         zombie = Zombie.new(self, "media/Zombie/stand_right.png", :left)
         zombie.move_to(-50, 440)
         @zombie << zombie
-      elsif @counter == 100
+      elsif @counter.between?(100,(@score / 30) + 100)
         zombie = Zombie.new(self, "media/Zombie/stand_left.png", :right)
         zombie.move_to(1280, 440)
         @zombie << zombie
@@ -122,9 +137,9 @@ class Game < Gosu::Window
           zombie.adjust_xpos 0
           @lives -= 1
         elsif zombie.dir == :left
-            zombie.adjust_xpos((@score / 5) + 3)
+            zombie.adjust_xpos((@score / 25) + 3)
         elsif zombie.dir == :right
-            zombie.adjust_xpos((@score / -5) - 3)
+            zombie.adjust_xpos((@score / -25) - 3)
         end
       end
       # Crate
@@ -151,7 +166,7 @@ class Game < Gosu::Window
           @cooldown = 0
         elsif @char.touching? crate and crate.item == :ammo
           @no_ammo.hide
-          @ammo += 5 if @ammo < 50
+          @ammo += 8 if @ammo < 50
           if @ammo > 50 #makes ammo equal to 50 if it goes above it
             @ammo = 50
           end
@@ -171,7 +186,7 @@ class Game < Gosu::Window
               @falling = false
             end
         elsif crate.y <= 500
-          crate.adjust_ypos 2
+          crate.adjust_ypos 2.5
         end
       end
       # Health
@@ -235,7 +250,7 @@ class Game < Gosu::Window
     @title.draw
     # Bullet Draw
     @bullet.each do |bullet|
-    bullet.draw
+      bullet.draw
       if bullet.x > 1280
        @bullet.delete(bullet)
        @shooting = false
@@ -261,27 +276,22 @@ class Game < Gosu::Window
     # Text Draw
     @text.draw("Ammo: #{@ammo}", 1, 0, 0)
     #@text.draw("Lives: #{@lives}", 1180, 0, 0)
-    @text.draw("Score: #{@score}", 640, 0, 0)
-    @cursor.draw(self.mouse_x, self.mouse_y, 0)
+    @text.draw("Score: #{@score}", 600, 0, 0)
     @game_over.draw
   end
-end
 
-class Crate < Sprite
-  attr_accessor :item
-
-  def initialize(window, image, item)
-    @item = item
-  super window, image
-  end
-end
-
-class Zombie < Sprite
-  attr_accessor :dir
-
-  def initialize(window, image, dir)
-    @dir = dir
-    super window, image
+  def reset
+    @char.move_to(640, 445)
+    @lives = 90
+    @ammo = 20
+    @score = 0
+    @zombie.each do |zombie|
+      @zombie.delete(zombie)
+    end
+    @crates.each do |crate|
+      @crates.delete(crate)
+    end
+    @game_over.hide
   end
 end
 
