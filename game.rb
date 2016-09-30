@@ -107,7 +107,7 @@ class Game < Gosu::Window
         @char.adjust_xpos(-7)
       end
       # Zombie Spawning
-      if @counter == 1
+      if @counter.between?(3,4)
         zombie = Zombie.new(self, "media/Zombie/stand_right.png", :left)
         zombie.move_to(-50, 440)
         @zombie << zombie
