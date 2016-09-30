@@ -99,7 +99,7 @@ class Game < Gosu::Window
       end
       # Movement
       if button_down? KbSpace and @ammo > 0 and @shooting == false # Shooting
-        #@gunshot.play
+        @gunshot.play
         @shooting = true
         @ammo -= 1
         bullet = Sprite.new(self, 'media/bullet.png')
@@ -122,11 +122,11 @@ class Game < Gosu::Window
         @char.adjust_xpos(-7)
       end
       # Zombie Spawning
-      if @counter.between?(3,(@score / 30) + 3)
+      if @counter.between?(3,(@score / 15) + 3)
         zombie = Zombie.new(self, "media/Zombie/stand_right.png", :left)
         zombie.move_to(-50, 440)
         @zombie << zombie
-      elsif @counter.between?(100,(@score / 30) + 100)
+      elsif @counter.between?(100,(@score / 15) + 100)
         zombie = Zombie.new(self, "media/Zombie/stand_left.png", :right)
         zombie.move_to(1280, 440)
         @zombie << zombie
