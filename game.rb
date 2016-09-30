@@ -38,9 +38,9 @@ class Game < Gosu::Window
     @health1 = Sprite.new(self, 'media/heart.png')
     @health2 = Sprite.new(self, 'media/heart.png')
     @health3 = Sprite.new(self, 'media/heart.png')
-    @health1.move_to(1160, 0)
-    @health2.move_to(1200, 0)
-    @health3.move_to(1240, 0)
+    @health1.move_to(1175, 0)
+    @health2.move_to(1210, 0)
+    @health3.move_to(1245, 0)
     # Game Detection
     @score = 0
     @ammo = 12
@@ -107,11 +107,11 @@ class Game < Gosu::Window
         @char.adjust_xpos(-7)
       end
       # Zombie Spawning
-      if @counter.between?(1,2)
+      if @counter == 1
         zombie = Zombie.new(self, "media/Zombie/stand_right.png", :left)
         zombie.move_to(-50, 440)
         @zombie << zombie
-      elsif @counter.between?(100,102)
+      elsif @counter == 100
         zombie = Zombie.new(self, "media/Zombie/stand_left.png", :right)
         zombie.move_to(1280, 440)
         @zombie << zombie
@@ -133,7 +133,7 @@ class Game < Gosu::Window
         crate.move_to(rand(30..1250), -10)
         @crates << crate
         @falling = true
-      elsif @counter == 90 and not @falling and @ammo <= 10
+      elsif @counter.between?(4,10) and not @falling and @ammo <= 10
         crate = Crate.new(self, "media/ammo.png", :ammo)
         crate.move_to(rand(30..1250), -10)
         @crates << crate
@@ -151,7 +151,7 @@ class Game < Gosu::Window
           @cooldown = 0
         elsif @char.touching? crate and crate.item == :ammo
           @no_ammo.hide
-          @ammo += 10 if @ammo < 50
+          @ammo += 5 if @ammo < 50
           if @ammo > 50 #makes ammo equal to 50 if it goes above it
             @ammo = 50
           end
