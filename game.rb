@@ -218,6 +218,8 @@ class Game < Gosu::Window
      end
    elsif @shooting and @ammo == 0
      @no_ammo.show
+   elsif @ammo >= 1
+     @no_ammo.hide
    end
    # Bullet Detection
    @bullet.each do |bullet|
