@@ -79,6 +79,7 @@ class Game < Gosu::Window
       Sound.play('media/Sounds/zombies.wav', Sound::ASYNC | Sound::LOOP)
       @game_start = true
       @title.hide
+      @game_over.hide
       reset
     end
 
@@ -206,17 +207,21 @@ class Game < Gosu::Window
       end
     end # End @game_start
    # Shooting
-   if @shooting and @ammo >= 0 then
-     if @dir == :left
-      @bullet.each do |bullet|
-        bullet.adjust_xpos(-20)
-      end
-     elsif @dir == :right
-       @bullet.each do |bullet|
-         bullet.adjust_xpos 20
-      end
+    @bullet.each do |bullet|
+     if bullet.dir == :left
+      bullet.adjust_xpos(-20)
+     elsif bullet.dir == :right
+      bullet.adjust_xpos 20
      end
-   elsif @shooting and @ammo == 0
+     if bullet.x > 1280
+      @bullet.delete(bullet)
+      shooting = false
+     elsif bullet.x < 10
+      @bullet.delete(bullet)
+      @shooting = false
+     end
+    end
+   if @shooting and @ammo == 0
      @no_ammo.show
    elsif @ammo >= 1
      @no_ammo.hide
@@ -241,6 +246,7 @@ class Game < Gosu::Window
    # Game Over
    if @lives < 0
       @game_over.show
+      reset
       @game_start = false
    end
    # Close Window
@@ -251,24 +257,11 @@ class Game < Gosu::Window
     @menu.see(0,0,0,1.6,1.25)
     @title.draw
     # Bullet Draw
-    @bullet.each do |bullet|
-      bullet.draw
-      if bullet.x > 1280
-       @bullet.delete(bullet)
-       @shooting = false
-      elsif bullet.x < 10
-       @bullet.delete(bullet)
-       @shooting = false
-      end
-    end
+    @bullet.each {|bullet| bullet.draw}
     # Zombie Draw
-    @zombie.each do |zombie|
-      zombie.draw
-    end
+    @zombie.each {|zombie| zombie.draw}
     # Crate Draw
-    @crates.each do |crate|
-      crate.draw
-    end
+    @crates.each {|crate| crate.draw}
     @no_ammo.draw
     @char.draw
     # Health Draw
@@ -287,13 +280,8 @@ class Game < Gosu::Window
     @lives = 90
     @ammo = 20
     @score = 0
-    @zombie.each do |zombie|
-      @zombie.delete(zombie)
-    end
-    @crates.each do |crate|
-      @crates.delete(crate)
-    end
-    @game_over.hide
+    @zombie.each {|zombie| @zombie.delete(zombie)}
+    @crates.each {|crate| @crates.delete(crate)}
   end
 end
 
