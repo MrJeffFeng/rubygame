@@ -22,6 +22,14 @@ class Zombie < Sprite # Zombie Class
   end
 end
 
+class Bullet < Sprite # Bullet Class
+  attr_accessor :dir
+  def initialize(window, image, dir)
+    @dir = dir
+    super window, image
+  end
+end
+
 class Game < Gosu::Window
   def initialize
     # Game Window
@@ -213,6 +221,7 @@ class Game < Gosu::Window
      elsif bullet.dir == :right
       bullet.adjust_xpos 20
      end
+     # Detection
      if bullet.x > 1280
       @bullet.delete(bullet)
       shooting = false
