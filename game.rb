@@ -107,25 +107,28 @@ class Game < Gosu::Window
         @char = @stand_right
       end
       # Movement
-      if button_down? KbSpace and @ammo > 0 and @shooting == false # Shooting
+      if button_down? KbSpace and @ammo > 0 and !@shooting # Shooting
         @gunshot.play
         @shooting = true
         @ammo -= 1
-        bullet = Sprite.new(self, 'media/bullet.png')
-        bullet.move_to(@char.x + 50, @char.y + 30)
-        @bullet << bullet
         if @dir == :left then
           @char = @shoot_left
+          bullet = Bullet.new(self, 'media/bullet.png', :left)
+          bullet.move_to(@char.x + 50, @char.y + 30)
+          @bullet << bullet
         elsif @dir == :right then
           @char = @shoot_right
+          bullet = Bullet.new(self, 'media/bullet.png', :right)
+          bullet.move_to(@char.x + 50, @char.y + 30)
+          @bullet << bullet
         end
       elsif button_down? KbSpace and @ammo == 0
         @no_ammo.show
-      elsif (button_down? KbD or button_down? KbRight) and @shooting == false
+      elsif (button_down? KbD or button_down? KbRight)
         @char = @walk_right
         @dir = :right
         @char.adjust_xpos 7
-      elsif (button_down? KbA or button_down? KbLeft) and @shooting == false
+      elsif (button_down? KbA or button_down? KbLeft)
         @char = @walk_left
         @dir = :left
         @char.adjust_xpos(-7)
