@@ -227,7 +227,7 @@ class Game < Gosu::Window
      # Detection
      if bullet.x > 1280
       @bullet.delete(bullet)
-      shooting = false
+      @shooting = false
      elsif bullet.x < 10
       @bullet.delete(bullet)
       @shooting = false
